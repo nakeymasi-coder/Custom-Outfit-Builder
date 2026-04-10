@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Custom Outfit Builder – Ultimate Glow Up Edition</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    :root {
+      --royal: #4169E1; --royal-2: #2647b8; --gold: #D4AF37; --gold-soft: #f3d57a; --white: #ffffff;
+      --black: #05070b; --black-2:#0b0f16;
+      --line: rgba(255,255,255,.12); --panel: rgba(7,10,16,.88); --shadow: 0 16px 50px rgba(0,0,0,.45);
+      --glow: 0 0 0 1px rgba(255,255,255,.08), 0 0 28px rgba(65,105,225,.24), 0 0 44px rgba(212,175,55,.14);
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      min-height:100vh; font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--white);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(53,87,255,.20), transparent 16%),
+        radial-gradient(circle at 84% 8%, rgba(245,179,1,.12), transparent 15%),
+        radial-gradient(circle at 80% 74%, rgba(53,87,255,.16), transparent 20%),
+        linear-gradient(145deg, #030508 0%, #08101f 38%, #040608 100%);
+      overflow-x:hidden;
+    }
+    body::before, body::after {
+      content:""; position:fixed; inset:-20%; pointer-events:none; z-index:0;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,.08) 0 1px, transparent 2px),
+        radial-gradient(circle at 70% 10%, rgba(255,216,106,.10) 0 1.5px, transparent 3px),
+        radial-gradient(circle at 80% 50%, rgba(255,255,255,.07) 0 1px, transparent 2px),
+        radial-gradient(circle at 35% 75%, rgba(255,216,106,.08) 0 1.5px, transparent 3px),
+        radial-gradient(circle at 62% 82%, rgba(255,255,255,.07) 0 1px, transparent 2px);
+      animation:floatGlow 18s linear infinite;
+    }
+    body::after { animation-duration:24s; opacity:.65; transform:scale(1.15); }
+    @keyframes floatGlow { from { transform: translateY(0) translateX(0) rotate(0deg); } 50% { transform: translateY(-18px) translateX(10px) rotate(1deg);} to { transform: translateY(0) translateX(0) rotate(0deg);} }
+    .app { max-width:1400px; margin:0 auto; padding:28px 18px 44px; position:relative; z-index:1; animation:riseFade .6s ease; }
+    @keyframes orbFloat { 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(-12px,-16px) scale(1.06);} }
+    @keyframes shineSweep { 0%{ transform:translateX(-120%);} 55%,100%{ transform:translateX(120%);} }
+    @keyframes pulseGlow { 0%,100%{ box-shadow:0 10px 28px rgba(65,105,225,.25), 0 0 0 rgba(212,175,55,0);} 50%{ box-shadow:0 14px 34px rgba(65,105,225,.35), 0 0 22px rgba(212,175,55,.18);} }
+    @keyframes riseFade { from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:translateY(0);} }
+
+    .hero,.panel { background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.035)); border:1px solid var(--line); border-radius:28px; box-shadow:var(--shadow), var(--glow); backdrop-filter:blur(16px); position:relative; overflow:hidden; }
+    .hero::before,.panel::before{content:"";position:absolute;inset:auto -20% -65% auto;width:280px;height:280px;background:radial-gradient(circle, rgba(65,105,225,.20), transparent 68%);pointer-events:none;animation:orbFloat 9s ease-in-out infinite;}
+    .hero::after,.panel::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,.02) 25%, rgba(212,175,55,.08) 50%, transparent 75%);transform:translateX(-120%);animation:shineSweep 9s linear infinite;pointer-events:none;}
+    .hero { padding:26px; margin-bottom:18px; }
+    .eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:.82rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-soft); background:rgba(245,179,1,.12); border:1px solid rgba(245,179,1,.28); border-radius:999px; padding:8px 12px; margin-bottom:14px; }
+    .hero h1 { font-size:clamp(2rem, 5vw, 3.4rem); line-height:.98; margin-bottom:10px; font-weight:900; letter-spacing:-.03em; }
+    .hero p { color:#d5dbef; max-width:980px; line-height:1.6; font-size:1rem; }
+    .hero-grid,.shell,.section-grid { display:grid; gap:16px; }
+    .hero-grid { grid-template-columns:1.1fr .9fr; margin-top:16px; }
+    .shell { grid-template-columns:1.15fr .85fr; align-items:start; }
+    .section-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .howto,.jump-box,.card,.preset-bar,.mini-box,.history-wrap details { background:rgba(255,255,255,.05); border:1px solid var(--line); border-radius:20px; padding:16px; animation:riseFade .55s ease both; }
+    .card:hover,.howto:hover,.jump-box:hover,.preset-bar:hover,.mini-box:hover,.history-wrap details:hover{ transform:translateY(-2px); box-shadow:0 12px 34px rgba(65,105,225,.10), 0 0 18px rgba(212,175,55,.08); }
+    .howto h2,.jump-box h2,.preset-bar h3,.mini-box h3,.history-wrap summary { color:var(--gold-soft); font-size:1rem; font-weight:800; margin-bottom:10px; }
+    .howto ol { padding-left:18px; color:#dce2f7; line-height:1.7; }
+    .builder,.output-wrap { padding:18px; }
+    .toolbar,.jump-actions,.output-actions { display:flex; flex-wrap:wrap; gap:10px; }
+    .toolbar { margin-bottom:16px; }
+    .btn { appearance:none; border:1px solid transparent; border-radius:14px; padding:12px 14px; font-weight:800; font-size:.95rem; cursor:pointer; transition:.22s ease; text-decoration:none; color:var(--white); box-shadow:0 10px 22px rgba(0,0,0,.22); position:relative; overflow:hidden; }
+    .btn::before{content:""; position:absolute; inset:0; background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,.12) 35%, transparent 70%); transform:translateX(-140%); transition:transform .45s ease;}
+    .btn:hover::before{ transform:translateX(140%); }
+    .btn:hover { transform:translateY(-2px) scale(1.01); } .btn:active { transform:translateY(0) scale(.99); }
+    .btn-primary { background:linear-gradient(135deg, var(--royal), var(--royal-2)); animation:pulseGlow 3.5s ease-in-out infinite; }
+    .btn-gold { background:linear-gradient(135deg, #b58d1d, var(--gold)); color:#140f00; }
+    .btn-dark { background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05)); border-color:var(--line); }
+    .btn-danger { background:linear-gradient(180deg, rgba(255,89,110,.18), rgba(255,89,110,.10)); border-color:rgba(255,95,122,.25); }
+    .btn-ghost { background:transparent; border-color:var(--line); }
+    .btn.small { padding:10px 12px; font-size:.84rem; border-radius:12px; }
+    .preset-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+    .preset-btn { text-align:left; min-height:54px; background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04)); border:1px solid var(--line); }
+    .card-top { display:flex; justify-content:space-between; gap:14px; align-items:center; margin-bottom:12px; }
+    .helper { color:#c8d0e8; font-size:.88rem; margin-top:-4px; margin-bottom:12px; line-height:1.45; }
+    .lock-btn.locked { background:rgba(245,179,1,.17); border-color:rgba(245,179,1,.35); color:var(--gold-soft); }
+    select,textarea,input[type="text"] { width:100%; border-radius:16px; border:1px solid rgba(255,255,255,.14); background:rgba(5,7,15,.78); color:var(--white); padding:14px; font:inherit; outline:none; transition:.2s ease; }
+    select:focus,textarea:focus,input[type="text"]:focus { border-color:rgba(245,179,1,.65); box-shadow:0 0 0 3px rgba(245,179,1,.12); }
+    select[multiple] { min-height:220px; } textarea { min-height:84px; resize:vertical; margin-top:10px; }
+    .check-wrap { display:flex; align-items:flex-start; gap:12px; padding:14px; border-radius:16px; border:1px solid rgba(255,255,255,.14); background:rgba(5,7,15,.78); }
+    .check-wrap input[type="checkbox"] { width:20px; height:20px; margin-top:2px; accent-color:var(--gold); flex:0 0 auto; }
+    .hint { margin-top:8px; font-size:.8rem; color:#9ba7c9; line-height:1.4; }
+    .hide { display:none !important; }
+    .output-wrap { position:sticky; top:16px; }
+    .output-head { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:14px; }
+    .output-tabs { display:inline-flex; gap:8px; background:rgba(255,255,255,.05); border:1px solid var(--line); padding:6px; border-radius:999px; }
+    .tab-btn { border:0; background:transparent; color:#dfe6fb; font-weight:800; cursor:pointer; border-radius:999px; padding:10px 12px; }
+    .tab-btn.active { background:linear-gradient(135deg, var(--royal), var(--royal-2)); }
+    .output-box { min-height:360px; border-radius:22px; background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03)); border:1px solid var(--line); padding:18px; white-space:pre-wrap; line-height:1.7; color:#f3f6ff; overflow-wrap:anywhere; box-shadow:inset 0 0 0 1px rgba(65,105,225,.08), inset 0 0 40px rgba(212,175,55,.03); }
+    .variation-card { border-radius:16px; background:rgba(5,7,15,.55); border:1px solid rgba(255,255,255,.08); padding:12px; white-space:pre-wrap; line-height:1.6; }
+    .placeholder { color:#93a0c7; font-style:italic; }
+    .toast{ position:fixed; right:18px; bottom:18px; z-index:50; background:linear-gradient(135deg, rgba(65,105,225,.95), rgba(212,175,55,.90)); color:#fff; padding:12px 14px; border-radius:14px; box-shadow:0 14px 34px rgba(0,0,0,.3); font-weight:800; opacity:0; transform:translateY(10px); pointer-events:none; transition:.25s ease; }
+    .toast.show{ opacity:1; transform:translateY(0); }
+    .history-item { border-top:1px solid rgba(255,255,255,.08); padding-top:10px; margin-top:10px; }
+    .copyright { text-align:center; margin-top:22px; color:#b9c2df; font-size:.82rem; opacity:.95; }
+    @media (max-width:1180px) { .hero-grid,.shell { grid-template-columns:1fr; } .output-wrap { position:static; } }
+    @media (max-width:920px) { .section-grid { grid-template-columns:1fr; } }
+    @media (max-width:700px) { .app { padding:16px 12px 28px; } .hero,.builder,.output-wrap { padding:14px; } .preset-grid { grid-template-columns:1fr 1fr; } .card-top,.output-head { align-items:flex-start; flex-direction:column; } .btn { width:100%; } .toolbar .btn,.jump-actions .btn,.output-actions .btn { width:auto; flex:1 1 140px; } select[multiple] { min-height:170px; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <div class="eyebrow">✨ Glam Builder</div>
+      <h1 id="app-title"><strong>Custom Outfit Builder</strong></h1>
+      <p id="app-subtitle">Build fashion prompts fast with presets, locks, multi-select sections, reference-photo support, photo prompts, video prompts, save prompt, prompt history, and three extra variations in one glam file.</p>
+      <div class="hero-grid">
+        <div class="howto">
+          <h2>How to use</h2>
+          <ol>
+            <li>Pick a preset or choose your own stacked options.</li>
+            <li>Use the lock buttons before randomizing so your favorite parts stay put.</li>
+            <li>Pick gender first so the men and women outfit, shoe, and accessory options stay clean and separate.</li>
+            <li>Turn on the uploaded photo reference toggle when the user wants to upload a real photo and try the look on themselves.</li>
+            <li>Generate the photo prompt or video prompt, save it, then use the extra variations button for three more versions.</li>
+          </ol>
+        </div>
+        <div class="jump-box">
+          <h2>Quick moves</h2>
+          <p style="color:#dce2f7; line-height:1.55;">No scrolling in circles. Hit what you need and keep it moving.</p>
+          <div class="jump-actions">
+            <button class="btn btn-primary small" id="jumpToOutputBtn" type="button">Jump to Output</button>
+            <button class="btn btn-dark small" id="generateTopBtn" type="button">Generate Now</button>
+            
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="shell">
+      <section class="panel builder">
+        <div class="toolbar">
+          <button class="btn btn-gold" id="randomizeBtn" type="button">Randomize Unlocked</button>
+          <button class="btn btn-dark" id="generateBtn" type="button">Generate Prompts</button>
+                    <button class="btn btn-dark" id="savePromptBtn" type="button">Save Prompt</button>
+          <button class="btn btn-danger" id="clearBtn" type="button">Clear All</button>
+          <button class="btn btn-ghost" id="unlockAllBtn" type="button">Unlock All</button>
+        </div>
+
+        <div class="preset-bar">
+          <h3>15 Presets</h3>
+          <div class="preset-grid" id="presetGrid"></div>
+        </div>
+
+        <div class="section-grid" id="builderSections"></div>
+      </section>
+
+      <aside class="panel output-wrap" id="outputSection">
+        <div class="output-head">
+          <div>
+            <h2 style="margin-bottom:6px;">Output</h2>
+            <p style="color:#cbd4ef; line-height:1.5; font-size:.92rem;">Generate both versions, switch tabs if you want, copy what you need, and save your favorite prompt.</p>
+          </div>
+          <div class="output-tabs">
+            <button class="tab-btn active" data-tab="photo" type="button">Photo Prompt</button>
+            <button class="tab-btn" data-tab="video" type="button">Video Script</button>
+          </div>
+        </div>
+
+        <div class="output-box" id="photoOutput"><span class="placeholder">Your photo prompt will show up here.</span></div>
+        <div class="output-box" id="videoOutput" hidden><span class="placeholder">Your video prompt will show up here.</span></div>
+
+        <div class="output-actions" style="margin-top:14px;">
+          <button class="btn btn-primary" id="copyActiveBtn" type="button">Copy Active Output</button>
+          <button class="btn btn-dark" id="copyPhotoBtn" type="button">Copy Photo Prompt</button>
+          <button class="btn btn-dark" id="copyVideoBtn" type="button">Copy Video Script</button>
+        </div>
+
+        </div>
+
+        <div class="history-wrap">
+          <details>
+            <summary>Prompt History</summary>
+            <div id="historyList">
+              <div class="placeholder" style="padding-top:8px;">Saved prompts will show up here.</div>
+            </div>
+          </details>
+        </div>
+
+      </aside>
+    </div>
+
+    <div class="copyright">All rights reserved by glamorousgrammyglowup</div>
+  </div>
+
+  <script>
+    const DATA = {"eyeColors": ["None", "Amber", "Amethyst", "Aqua", "Black", "Blue Gray", "Bronze", "Caramel", "Chestnut", "Copper", "Dark Brown", "Emerald", "Forest Green", "Golden Brown", "Gray", "Green", "Hazel", "Honey", "Ice Blue", "Light Brown", "Lilac", "Navy", "Olive", "Sapphire", "Silver Gray", "Slate Blue", "Steel Gray", "Teal", "Topaz", "Violet", "Warm Brown"], "hairStyles": ["None", "Afro", "Bantu Knots", "Beach Waves", "Blunt Bob", "Box Braids", "Buzz Cut", "Coil Sponge", "Cornrows", "Curtain Bangs", "Dreadlocks", "Finger Waves", "French Bob", "Frohawk", "High Bun", "High Ponytail", "Layered Lob", "Loc Bun", "Loose Curls", "Low Bun", "Micro Braids", "Pixie Cut", "Sleek Bob", "Space Buns", "Spiky Cut", "Straight Long Layers", "Taper Fade", "Textured Crop", "Top Knot", "Twist Out", "Wolf Cut"], "ethnicities": ["None", "African American", "Arab", "Asian", "Black British", "Caribbean", "East African", "East Asian", "Eastern European", "Filipino", "Hispanic", "Indian", "Indigenous", "Italian", "Latina", "Mediterranean", "Mexican", "Middle Eastern", "Mixed Heritage", "Native American", "North African", "Pacific Islander", "Puerto Rican", "South African", "South Asian", "Southeast Asian", "Spanish", "Turkish", "West African", "White", "White European"], "genders": ["None", "Man", "Woman"], "hairColors": ["None", "Ash Blonde", "Ash Brown", "Auburn", "Black", "Blue Black", "Burgundy", "Caramel", "Champagne Blonde", "Chestnut", "Chocolate Brown", "Copper", "Dark Brown", "Espresso", "Ginger", "Golden Blonde", "Gray", "Honey Blonde", "Jet Black", "Lavender Black", "Mahogany", "Midnight Blue", "Mint Green", "Pastel Pink", "Platinum Blonde", "Red", "Rose Gold", "Silver", "Strawberry Blonde", "Teal", "White Blonde"], "hairGems": ["None", "Butterfly Clips", "Chain Tassels", "Crystal Combs", "Crystal Crown Pins", "Crystal Hair Rings", "Diamond Barrettes", "Emerald Line Pins", "Floral Pearl Pins", "Gem Bobby Pins", "Gem Headband", "Gold Cuffs", "Gold Leaf Clips", "Halo Chain", "Heart Charms", "Iridescent Stars", "Jeweled Braid Rings", "Micro Crystal Locks", "Moon Pins", "Pearl Clusters", "Pearl Hair Vine", "Rhinestone Geometry", "Rose Stud Pins", "Ruby Hair Charms", "Sapphire Pins", "Silver Thread Wrap", "Starburst Clips", "Sunburst Pins", "Velvet Gem Bow", "Vintage Brooch Clip", "Winged Crystal Pins"], "womenShoes": ["None", "Ankle Strap Heels", "Ballet Flats", "Block Heel Sandals", "Chunky Sneakers", "Combat Boots", "Cowboy Boots", "Crystal Pumps", "Designer Slides", "Espadrille Wedges", "Gladiator Sandals", "Heeled Mules", "Kitten Heels", "Knee High Boots", "Lace Up Heels", "Loafers", "Mary Janes", "Metallic Heels", "Platform Boots", "Platform Sandals", "Pointed Toe Pumps", "Satin Heels", "Sculptural Heels", "Slingback Heels", "Square Toe Boots", "Stiletto Boots", "Strappy Sandals", "T Strap Heels", "Thigh High Boots", "Wedge Sandals", "White Sneakers"], "menShoes": ["None", "Boat Shoes", "Chelsea Boots", "Chunky Sneakers", "Classic Loafers", "Combat Boots", "Cowboy Boots", "Derby Shoes", "Desert Boots", "Designer Slides", "Double Monk Straps", "Espadrilles", "High Top Sneakers", "Leather Sandals", "Luxe Slip Ons", "Minimal Sneakers", "Moccasins", "Oxford Shoes", "Penny Loafers", "Platform Sneakers", "Running Sneakers", "Skate Shoes", "Slim Dress Boots", "Slip On Loafers", "Square Toe Boots", "Suede Loafers", "Tactical Boots", "Tennis Sneakers", "White Sneakers", "Wingtip Shoes", "Zip Boots"], "womenOutfits": ["None", "Asymmetrical Dress", "Bodysuit and Skirt Set", "Boss Blazer Dress", "Cargo Jumpsuit", "Corset Top and Trousers", "Denim Set", "Draped Gown", "Editorial Pantsuit", "Fitted Midi Dress", "Flared Jumpsuit", "Fringe Dress", "Glitter Co Ord", "Halter Gown", "Leather Set", "Linen Resort Set", "Maxi Dress", "Mermaid Dress", "Mini Dress", "Off Shoulder Dress", "Oversized Blazer Set", "Pencil Skirt Set", "Pleated Dress", "Ribbed Knit Set", "Satin Suit", "Sequin Dress", "Sheer Overlay Dress", "Slip Dress", "Structured Romper", "Tailored Shorts Set", "Wide Leg Suit"], "menOutfits": ["None", "Athleisure Set", "Bomber Jacket Set", "Cargo Set", "Cashmere Knit Set", "Denim Set", "Double Breasted Suit", "Editorial Streetwear Set", "Formal Tuxedo", "Hoodie and Trousers", "Knitted Polo Set", "Leather Suit", "Linen Suit", "Long Coat Look", "Monochrome Suit", "Open Collar Suit", "Oversized Tailored Fit", "Painterly Metallic Accent Suit", "Patterned Suit", "Pleated Trouser Set", "Relaxed Blazer Set", "Resort Shirt Set", "Ribbed Knit Set", "Satin Suit", "Street Luxury Set", "Striped Suit", "Tailored Vest Set", "Textured Suit", "Turtleneck Suit", "Utility Set", "Wide Leg Trouser Set"], "lashes": ["None", "Anime Wispy Lashes", "Barely There Lashes", "Bold Cat Eye Lashes", "Bottom Lash Detail", "Classic Full Lashes", "Cluster Lashes", "D Curl Extensions", "Doll Eye Lashes", "Dramatic Wispy Lashes", "Feathered Lashes", "Fluttery Natural Lashes", "Full Glam Lashes", "Hybrid Lashes", "Long Separated Lashes", "Mega Volume Lashes", "Natural Curl Lashes", "Outer Corner Lashes", "Piecey Lashes", "Rounded Volume Lashes", "Siren Eye Lashes", "Soft Glam Lashes", "Spiky Editorial Lashes", "Stacked Lashes", "Textured Wispy Lashes", "Thin Defined Lashes", "Ultra Dense Lashes", "Volume Fan Lashes", "Wet Look Lashes", "Whispy Doll Lashes", "Winged Lashes"], "ornateElements": ["None", "Art Deco Frame", "Baroque Scrollwork", "Butterfly Overlay", "Celestial Halo", "Chain Draping", "Crystal Dust", "Diamond Border", "Dreamy Sparkles", "Embossed Gold Trim", "Feather Flourish", "Floral Frame", "Gem Clusters", "Glitter Mist", "Glossy Hearts", "Gothic Arch", "Graphic Halftone", "Holographic Shimmer", "Lace Overlay", "Light Leaks", "Marble Texture", "Metallic Foil Swirls", "Mirror Fragments", "Neon Glow Lines", "Pearl Scatter", "Prism Reflections", "Rhinestone Stars", "Rose Petals", "Smoke Trails", "Velvet Ribbon Accents", "Vintage Postage Motif"], "womenAccessories": ["None", "Anklet", "Bangle Stack", "Beaded Clutch", "Body Chain", "Cat Eye Sunglasses", "Chain Belt", "Charm Bracelet", "Choker Necklace", "Claw Clip", "Crossbody Bag", "Cuff Bracelet", "Designer Tote", "Drop Earrings", "Evening Gloves", "Gem Headband", "Hair Scarf", "Layered Necklace", "Mini Bag", "Pearl Earrings", "Phone Case Chain", "Quilted Handbag", "Ring Stack", "Satin Bow", "Shoulder Bag", "Silk Scarf", "Statement Earrings", "Structured Tote", "Top Handle Bag", "Waist Belt", "Watch"], "menAccessories": ["None", "Band Ring", "Beanie", "Bracelet Stack", "Bucket Hat", "Chain Necklace", "Crossbody Bag", "Cufflinks", "Designer Watch", "Dog Tag", "Duffel Bag", "Fedora", "Flat Cap", "Leather Belt", "Leather Bracelet", "Messenger Bag", "Pocket Square", "Rings", "Scarf", "Shoulder Bag", "Signet Ring", "Sunglasses", "Suspenders", "Tie Bar", "Tie Pin", "Tote Bag", "Wallet Chain", "Watch", "Wide Brim Hat", "Wrist Cuff", "Zip Pouch"], "hairEdges": ["None", "Baby Hair Swirls", "Clean Natural Edge", "Curved Swoop Edges", "Defined Temple Swirls", "Dramatic Curl Edges", "Feathered Edge Detail", "Fine Finger Waves", "Glossy Laid Edges", "Heart Shaped Edges", "Looped Edge Design", "Micro Swoop Edges", "Minimal Edge Detail", "Neat Edge Brush Detail", "No Edge Styling", "Polished Sideburn Detail", "S Curl Edge Pattern", "Sharp Edge Lines", "Soft Curved Edges", "Soft Laid Edges", "Spiral Edge Design", "Styled Widow Peak Detail", "Subtle Edge Sweep", "Temple Curl Detail", "Triple Swoop Edges", "Ultra Sleek Edges", "Wave Pattern Edges", "Whisper Thin Edges", "Wide Swoop Edges", "Zigzag Edge Detail", "Zoot Wave Edges"], "skinTones": ["None", "Almond", "Bronze", "Caramel", "Chestnut", "Cinnamon", "Cocoa", "Cool Beige", "Cool Brown", "Cream", "Deep Bronze", "Deep Espresso", "Ebony", "Golden Beige", "Golden Brown", "Honey", "Ivory", "Light Beige", "Light Brown", "Mahogany", "Mocha", "Neutral Beige", "Olive", "Peach Beige", "Porcelain", "Rich Brown", "Rosy Beige", "Soft Tan", "Tan", "Toffee", "Warm Brown"], "cameraControls": ["None", "35mm Classic Film Lens", "Aerial View", "Close Up Portrait", "Dutch Angle", "Editorial Cover Framing", "Eye Level Shot", "Full Body Shot", "Head to Toe Full Body", "Heroic Low Angle Shot", "High Angle Shot", "Long Shot", "Macro Detail Shot", "Medium Portrait", "Motion Blur Tracking Shot", "Over the Shoulder Shot", "Rear Three Quarter Shot", "Runway Distance Shot", "Side Profile Pose", "Slight Top Down Shot", "Symmetrical Center Framing", "Telephoto Compression", "Three Quarter Portrait", "Tight Portrait Crop", "Top Down Flat Lay", "Ultra Wide Environmental Shot", "Waist Up Shot", "Walking Follow Shot", "Wide Fashion Shot", "Window Lean Pose", "Zoomed Out Editorial Shot"], "lightingControls": ["None", "Backlit Glow", "Beauty Ring Light", "Blue Hour Cool Light", "Candlelit Warmth", "Chrome Reflection Lighting", "Cloud Filtered Daylight", "Commercial Softbox Light", "Crisp Daylight", "Diffused Studio Light", "Editorial Flash", "Fiery Warm Glow", "Flash Pop Lighting", "Golden Hour Light", "High Contrast Dramatic Light", "Luxury Lobby Warm Light", "Moonlit Blue Glow", "Natural Window Light", "Neon Accent Lighting", "Overcast Soft Light", "Polished Beauty Light", "Radiant Spotlight", "Reflective Bounce Light", "Rim Light Glow", "Satin Soft Glam Light", "Silvery Night Reflections", "Sunset Glow", "Top Light Editorial", "Warm Studio Glow", "White Seamless Lighting", "Window Strip Light"], "shadowControls": ["None", "Airy Minimal Shadows", "Bold Cast Shadows", "Clean Controlled Shadows", "Dark Cinematic Falloff", "Deep Mood Shadows", "Diffuse Shadowing", "Directional Side Shadows", "Dramatic Floor Shadows", "Dramatic Rim Shadows", "Editorial Contrast Shadows", "Elongated Sunset Shadows", "Feathered Soft Shadows", "Hard Edge Shadows", "High Fashion Contrast", "Layered Background Shadows", "Low Key Shadowing", "Moody Tunnel Shadows", "No Harsh Shadows", "Polished Soft Shadow", "Reflective Surface Shadows", "Shadow Gradient Backdrop", "Sharp Architectural Shadows", "Silky Diffuse Shadows", "Smoky Diffuse Shadowing", "Soft Box Shadow", "Soft Contour Shadows", "Spotlight Pool Shadow", "Subtle Depth Shadows", "Textured Wall Shadows", "Underlighting Shadows"], "backgroundControls": ["None", "Beauty Studio Backdrop", "Black Gloss Set", "Boutique Penthouse Suite", "Champagne Lounge", "City Rooftop", "Clean White Seamless", "Color Wash Backdrop", "Creative Stage Set", "Desert Resort", "Dreamy Cloud Backdrop", "Editorial Runway Set", "Floral Installation", "Futuristic Hallway", "Garden Estate", "Golden Curtain Backdrop", "Graffiti Alley", "High End Closet", "Luxury Lobby", "Luxury Retail Corridor", "Marble Hallway", "Minimal Concrete Studio", "Mirrored Room", "Moody Velvet Backdrop", "Neon Club Interior", "Private Jet Stairway", "Ranch Estate", "Street Style Corner", "Sunset Beach Walkway", "Textured Paper Backdrop", "Window Light Loft"], "presets": ["Boss Babe Blueprint", "City Luxe", "Coastal Glam", "Cowgirl Rich", "Editorial Denim", "Futuristic Glow", "Golden Hour Rich", "Leather Drama", "Mermaid Pop", "Minimal Money", "Penthouse Power", "Pink Pressure", "Quiet Luxury", "Street Heat", "Velvet Night"]};
+
+    const BASE_STYLES = ['None','Bossed Up Glam','City Luxe','Coastal Rich','Creative Director Chic','Cyber Safari','Dreamcore','Editorial Denim','Euro Summer','Futuristic Glam','Glamoratti','Industrial Tech','Jet Set Editorial','Luxury Athleisure','Mermaidcore','Minimal Money','Monochrome Ice','Neo Punk','Old Money Edge','Pink Pressure','Polished Executive','Quiet Luxury','Resort Glam','Runway Rich','Soft Power','Street Prep','Tangerine Disco','Velvet Night','Western Reboot','Y2K Gloss'];
+    const locks = {};
+    let activeTab = 'photo';
+
+    const sections = [
+      { key:'gender', type:'single', title:'Gender', helper:'Pick this first so the men and women sections don’t spill into each other.', options: DATA.genders, custom:true, hint:'This controls which outfit, shoe, and accessory sections stay visible.'},
+      { key:'ethnicity', type:'multi', title:'Ethnicity', helper:'Use this when you want the subject description locked in.', options: DATA.ethnicities, custom:true, hint:'First option is None. Everything else is alphabetical.'},
+      { key:'skinTone', type:'multi', title:'Skin Tone', helper:'Use one or two tones max unless you want a stylized blend.', options: DATA.skinTones, custom:true, hint:'This helps the prompt stay visually specific.'},
+      { key:'eyeColor', type:'multi', title:'Eye Color', helper:'Stack eye color and custom notes only if you really need to.', options: DATA.eyeColors, custom:true, hint:'Good for beauty-heavy looks and portrait prompts.'},
+      { key:'hairStyle', type:'multi', title:'Hair Style', helper:'Choose the style shape here.', options: DATA.hairStyles, custom:true, hint:'Use this with hair color, gems, and edges for a fuller look.'},
+      { key:'hairColor', type:'multi', title:'Hair Color', helper:'This controls the main hair tone.', options: DATA.hairColors, custom:true, hint:'You can mix shades for streaks, ombré, or blends.'},
+      { key:'hairGems', type:'multi', title:'Hair Gems', helper:'For extra glam. Skip it if the look should stay clean.', options: DATA.hairGems, custom:true, hint:'Use this for crystal, pearl, metallic, or sparkle details.'},
+      { key:'hairEdges', type:'multi', title:'Hair Edges', helper:'Great for polished close-up beauty styling.', options: DATA.hairEdges, custom:true, hint:'Use one clean style unless you want a more editorial mix.'},
+      { key:'lashes', type:'multi', title:'Lashes', helper:'Skip this for men unless you want a beauty-forward or stylized result.', options: DATA.lashes, custom:true, hint:'This is optional. Don’t force it into every prompt.'},
+      { key:'style', type:'multi', title:'Vibe / Style', helper:'Stack a few if you want a blended aesthetic.', options: BASE_STYLES, custom:true, hint:'This original section stays. I only expanded it.'},
+      { key:'womenOutfit', type:'multi', title:'Women Outfit', helper:'This only shows when Woman is selected or Gender is None.', options: DATA.womenOutfits, custom:true, hint:'Kept separate so women options don’t spill into men.', genderScope:'Woman'},
+      { key:'menOutfit', type:'multi', title:'Men Outfit', helper:'This only shows when Man is selected or Gender is None.', options: DATA.menOutfits, custom:true, hint:'Kept separate so men options don’t pick up women styling by accident.', genderScope:'Man'},
+      { key:'womenShoes', type:'multi', title:'Women Shoes', helper:'This only shows when Woman is selected or Gender is None.', options: DATA.womenShoes, custom:true, hint:'Separate from men shoes to keep the logic clean.', genderScope:'Woman'},
+      { key:'menShoes', type:'multi', title:'Men Shoes', helper:'This only shows when Man is selected or Gender is None.', options: DATA.menShoes, custom:true, hint:'Built separately so it doesn’t get mixed with women shoes.', genderScope:'Man'},
+      { key:'womenAccessories', type:'multi', title:'Women Accessories', helper:'This only shows when Woman is selected or Gender is None.', options: DATA.womenAccessories, custom:true, hint:'Kept separate so bags, jewelry, and styling stay cleaner.', genderScope:'Woman'},
+      { key:'menAccessories', type:'multi', title:'Men Accessories', helper:'This only shows when Man is selected or Gender is None.', options: DATA.menAccessories, custom:true, hint:'Separate so watches, hats, chains, and bags stay gender-safe.', genderScope:'Man'},
+      { key:'ornate', type:'multi', title:'Ornate Elements', helper:'Use this when you want a more decorative, luxury, or artistic prompt.', options: DATA.ornateElements, custom:true, hint:'Perfect for journal covers, glam portraits, and stylized visual builds.'},
+      { key:'camera', type:'multi', title:'Camera Control', helper:'Full camera control lives here.', options: DATA.cameraControls, custom:true, hint:'Shot type, lens feel, framing, angle, and movement all belong here.'},
+      { key:'lighting', type:'multi', title:'Light Control', helper:'Full lighting control lives here.', options: DATA.lightingControls, custom:true, hint:'Pick one strong lighting direction or blend a couple for nuance.'},
+      { key:'shadow', type:'multi', title:'Shadow Control', helper:'Full light and shadow control means this matters too.', options: DATA.shadowControls, custom:true, hint:'Use this for drama, softness, contrast, and depth.'},
+      { key:'background', type:'multi', title:'Background / Environment', helper:'This keeps the background suitable for the subject matter.', options: DATA.backgroundControls, custom:true, hint:'This section helps the subject and set actually match each other.'},
+      { key:'occasion', type:'text', title:'Occasion / Setting', helper:'This grounds the look so it doesn’t float around doing nothing.', custom:true, hint:'Use this for context, vibe, props, or time of day.'},
+      { key:'details', type:'text', title:'Personal Touches / Extra Details', helper:'This is where the look gets personality.', custom:true, hint:'Perfect for pose, expression, movement, makeup, attitude, or texture notes.'},
+      { key:'reference', type:'reference', title:'Reference Photo', helper:'Turn this on when the user wants to upload their own photo and try the outfit on themselves.', custom:true, hint:'This makes the prompt say same person, new styling, not random face swap nonsense.'}
+    ];
+
+    const ids = { photoOutput:document.getElementById('photoOutput'), videoOutput:document.getElementById('videoOutput'), historyList:document.getElementById('historyList'), sections:{} };
+
+    function makeCard(section) {
+      const wrap = document.createElement('div');
+      wrap.className = 'card';
+      wrap.id = section.key + 'Card';
+      wrap.dataset.category = section.key;
+      wrap.innerHTML = `
+        <div class="card-top">
+          <div>
+            <h3>${section.title}</h3>
+            <div class="helper">${section.helper}</div>
+          </div>
+          <button class="btn btn-dark small lock-btn" data-lock="${section.key}" type="button">🔓 Unlocked</button>
+        </div>
+      `;
+      let mainInput;
+      if (section.type === 'multi' || section.type === 'single') {
+        mainInput = document.createElement('select');
+        mainInput.id = section.key + 'Select';
+        if (section.type === 'multi') mainInput.multiple = true;
+        wrap.appendChild(mainInput);
+      } else if (section.type === 'text') {
+        mainInput = document.createElement('input');
+        mainInput.type = 'text';
+        mainInput.id = section.key + 'Input';
+        mainInput.placeholder = section.key === 'occasion' ? 'Example: rooftop party, luxury hotel lobby, street style editorial' : 'Example: oversized sunglasses, wind-blown hair, holding coffee cup';
+        wrap.appendChild(mainInput);
+      } else if (section.type === 'reference') {
+        wrap.innerHTML += `
+          <label class="check-wrap" for="useReferencePhoto">
+            <input id="useReferencePhoto" type="checkbox" />
+            <div>
+              <strong>Use uploaded photo as reference</strong>
+              <span style="display:block;color:#c8d0e8;line-height:1.45;font-size:.92rem;">Add instructions to keep the same person from the uploaded photo and apply the selected outfit, colors, accessories, and vibe to them.</span>
+            </div>
+          </label>
+        `;
+        mainInput = wrap.querySelector('#useReferencePhoto');
+      }
+      let customInput = null;
+      if (section.custom) {
+        customInput = document.createElement('textarea');
+        customInput.id = section.key + 'Custom';
+        customInput.placeholder = section.type === 'reference' ? 'Optional reference notes. Example: keep face, body type, hairstyle, skin tone, and age range the same.' : `Add your own ${section.title.toLowerCase()} details...`;
+        wrap.appendChild(customInput);
+      }
+      const hint = document.createElement('div');
+      hint.className = 'hint';
+      hint.textContent = section.hint;
+      wrap.appendChild(hint);
+      ids.sections[section.key] = { card:wrap, input:mainInput, custom:customInput };
+      return wrap;
+    }
+
+    function fillSelect(selectEl, items, multiple=true) {
+      if (!selectEl) return;
+      selectEl.innerHTML = '';
+      items.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item;
+        opt.textContent = item;
+        selectEl.appendChild(opt);
+      });
+      if (!multiple) selectEl.removeAttribute('multiple');
+    }
+
+    function selectedValues(input) {
+      if (!input) return [];
+      if (input.tagName === 'SELECT') {
+        if (!input.multiple) return input.value && input.value !== 'None' ? [input.value] : [];
+        return [...input.selectedOptions].map(o => o.value).filter(v => v && v !== 'None');
+      }
+      if (input.type === 'checkbox') return input.checked ? ['Use uploaded photo as reference'] : [];
+      return input.value.trim() ? [input.value.trim()] : [];
+    }
+
+    function setSelectedValues(input, values) {
+      if (!input) return;
+      if (input.tagName === 'SELECT') {
+        if (!input.multiple) { input.value = values && values[0] ? values[0] : 'None'; return; }
+        const set = new Set(values || []);
+        [...input.options].forEach(opt => { opt.selected = set.has(opt.value); });
+      } else if (input.type === 'checkbox') {
+        input.checked = !!(values && values.length);
+      } else {
+        input.value = values && values[0] ? values[0] : '';
+      }
+    }
+
+    function randomFrom(arr, min=1, max=2) {
+      const filtered = arr.filter(x => x !== 'None');
+      const copy = [...filtered].sort(() => Math.random() - 0.5);
+      const count = Math.min(copy.length, Math.floor(Math.random() * (max - min + 1)) + min);
+      return copy.slice(0, count);
+    }
+
+    function sentenceList(items) {
+      const clean = items.filter(Boolean);
+      if (!clean.length) return '';
+      if (clean.length === 1) return clean[0];
+      if (clean.length === 2) return clean[0] + ' and ' + clean[1];
+      return clean.slice(0, -1).join(', ') + ', and ' + clean[clean.length - 1];
+    }
+
+    function buildSectionText(sectionKey) {
+      const section = ids.sections[sectionKey];
+      if (!section) return '';
+      const parts = [];
+      const base = selectedValues(section.input);
+      if (base.length) parts.push(sentenceList(base));
+      if (section.custom && section.custom.value.trim()) parts.push(section.custom.value.trim());
+      return parts.join('; ');
+    }
+
+    function currentGender() {
+      const g = ids.sections.gender?.input?.value || 'None';
+      return g;
+    }
+
+    function updateGenderVisibility() {
+      const gender = currentGender();
+      sections.forEach(section => {
+        if (!section.genderScope) return;
+        const shouldShow = gender === 'None' || gender === section.genderScope;
+        ids.sections[section.key].card.classList.toggle('hide', !shouldShow);
+      });
+    }
+
+    function generatePrompts(seed=0) {
+      const gender = currentGender();
+      const genderText = buildSectionText('gender');
+      const ethnicityText = buildSectionText('ethnicity');
+      const skinToneText = buildSectionText('skinTone');
+      const eyeText = buildSectionText('eyeColor');
+      const hairStyleText = buildSectionText('hairStyle');
+      const hairColorText = buildSectionText('hairColor');
+      const hairGemsText = buildSectionText('hairGems');
+      const hairEdgesText = buildSectionText('hairEdges');
+      const lashesText = buildSectionText('lashes');
+      const styleText = buildSectionText('style');
+      const womenOutfitText = buildSectionText('womenOutfit');
+      const menOutfitText = buildSectionText('menOutfit');
+      const womenShoesText = buildSectionText('womenShoes');
+      const menShoesText = buildSectionText('menShoes');
+      const womenAccText = buildSectionText('womenAccessories');
+      const menAccText = buildSectionText('menAccessories');
+      const ornateText = buildSectionText('ornate');
+      const cameraText = buildSectionText('camera');
+      const lightingText = buildSectionText('lighting');
+      const shadowText = buildSectionText('shadow');
+      const backgroundText = buildSectionText('background');
+      const occasionText = buildSectionText('occasion');
+      const detailText = buildSectionText('details');
+      const referenceText = ids.sections.reference.custom?.value.trim() || '';
+      const useReference = !!ids.sections.reference.input?.checked;
+
+      const outfitText = gender === 'Woman' ? womenOutfitText : gender === 'Man' ? menOutfitText : sentenceList([womenOutfitText, menOutfitText].filter(Boolean));
+      const shoesText = gender === 'Woman' ? womenShoesText : gender === 'Man' ? menShoesText : sentenceList([womenShoesText, menShoesText].filter(Boolean));
+      const accessoriesText = gender === 'Woman' ? womenAccText : gender === 'Man' ? menAccText : sentenceList([womenAccText, menAccText].filter(Boolean));
+
+      const subjectBits = [
+        genderText || 'fashion subject',
+        ethnicityText,
+        skinToneText,
+        eyeText ? `eye color: ${eyeText}` : '',
+        hairStyleText ? `hair style: ${hairStyleText}` : '',
+        hairColorText ? `hair color: ${hairColorText}` : '',
+        hairGemsText ? `hair gems: ${hairGemsText}` : '',
+        hairEdgesText ? `hair edges: ${hairEdgesText}` : '',
+        lashesText ? `lashes: ${lashesText}` : ''
+      ].filter(Boolean);
+
+      const occasion = occasionText || 'a luxury editorial fashion setting';
+      const styleLine = styleText || 'a polished high-end fashion direction';
+      const outfitLine = outfitText || 'an elevated fashion outfit';
+      const shoeLine = shoesText || 'premium footwear';
+      const accessoryLine = accessoriesText || 'refined accessories';
+      const ornateLine = ornateText ? ` Include ornate details such as ${ornateText}.` : '';
+
+      const variationProfiles = [
+        {
+          label: 'Editorial Power',
+          mood: 'Push the styling toward a commanding editorial fashion moment.',
+          pose: 'Use a strong asymmetrical pose with direct camera awareness, sharper body angles, and a stronger stance.',
+          camera: 'low-angle magazine framing with dramatic presence',
+          light: 'high-contrast spotlight glamour lighting',
+          shadow: 'deep sculpted shadows with dramatic shape',
+          scene: 'an exclusive black-tie luxury nightlife environment',
+          detail: 'assertive expression, dominant posture, stronger fashion attitude, and bold editorial energy'
+        },
+        {
+          label: 'Soft Luxury',
+          mood: 'Push the styling toward a softer luxury beauty campaign feel.',
+          pose: 'Use a graceful pose with fluid movement, elegant hand placement, and a softer expression.',
+          camera: 'refined beauty-fashion framing with graceful composition',
+          light: 'soft glow-forward luxury lighting with flattering highlights',
+          shadow: 'soft diffused shadows with polished skin finish',
+          scene: 'a romantic upscale interior with elegant luxury atmosphere',
+          detail: 'soft confidence, graceful movement, polished beauty energy, and elevated feminine or refined styling'
+        },
+        {
+          label: 'Bold Fashion',
+          mood: 'Push the styling toward a bolder high-fashion statement with stronger attitude.',
+          pose: 'Use a fashion-forward pose with more edge, stronger posture, and more deliberate body language.',
+          camera: 'sharp runway-editorial angle with bolder visual drama',
+          light: 'cinematic contrast lighting with stronger edge highlights',
+          shadow: 'deep cinematic shadows with striking contrast',
+          scene: 'a visually intense fashion-forward luxury set',
+          detail: 'edgy expression, fashion-week energy, stronger styling tension, and high-impact presence'
+        },
+        {
+          label: 'Commercial Glam',
+          mood: 'Push the styling toward a polished commercial glam campaign with broad appeal.',
+          pose: 'Use a confident polished pose that feels premium, clean, and highly sellable.',
+          camera: 'clear premium advertising composition with balanced framing',
+          light: 'crisp polished campaign lighting with clean separation',
+          shadow: 'controlled premium shadows with soft depth',
+          scene: 'a brand-ready upscale commercial glam setting',
+          detail: 'camera-friendly confidence, polished charm, premium finish, and broad luxury appeal'
+        }
+      ];
+      const profile = seed > 0 ? variationProfiles[(seed - 1) % variationProfiles.length] : null;
+      const variationLine = profile ? `${profile.mood} ${profile.pose}` : '';
+      const variationLabel = profile ? ` Variation direction: ${profile.label}. ${variationLine}` : '';
+
+      const cameraLine = profile ? (cameraText ? `${cameraText}; variation camera: ${profile.camera}` : profile.camera) : (cameraText || 'editorial cover framing');
+      const lightingLine = profile ? (lightingText ? `${lightingText}; variation lighting: ${profile.light}` : profile.light) : (lightingText || 'polished beauty light');
+      const shadowLine = profile ? (shadowText ? `${shadowText}; variation shadow mood: ${profile.shadow}` : profile.shadow) : (shadowText || 'clean controlled shadows');
+      const backgroundLine = profile ? (backgroundText ? `${backgroundText}; variation scene: ${profile.scene}` : profile.scene) : (backgroundText || 'a background suitable for the subject matter');
+      const detailLine = profile ? (detailText ? `${detailText}; variation styling direction: ${profile.detail}` : profile.detail) : (detailText || 'confident pose, camera-aware body language, refined expression, and polished styling');
+      let referenceLine = '';
+      if (useReference) {
+        referenceLine = ' Use the uploaded photo as the identity reference. Keep the same person, same face, same body type, same skin tone, same hairline, and same overall likeness from the uploaded image while changing only the outfit and styling to match this prompt.';
+        if (referenceText) referenceLine += ' ' + referenceText + '.';
+        referenceLine += ' Do not replace the person with a different model, and do not alter identity.';
+      }
+      const uniquenessLine = 'Each render must feature a uniquely distinct face, uniquely distinct pose, and uniquely distinct styling while maintaining the same overall aesthetic. Show one subject in one composition with one background only. Create one single standalone image only, not a collage, not a diptych, not a split-screen, not a side-by-side comparison, not a two-panel layout, not a contact sheet, and not a before-and-after layout.';
+
+      const photoPrompt = `Create a premium fashion image of ${sentenceList(subjectBits)}. Style the subject in ${outfitLine}, with ${shoeLine}, ${accessoryLine}, and ${styleLine}. Set the scene in ${occasion}, using ${backgroundLine}. Use ${cameraLine}, ${lightingLine}, and ${shadowLine}. Include ${detailLine}.${ornateLine}${referenceLine} ${uniquenessLine} Keep the composition polished, detailed, cohesive, visually rich, and sellable with balanced framing, realistic textures, premium finish, full subject visibility when full-body is requested, no awkward cropping, and one final frame only. ${variationLabel}`;
+
+      const videoPrompt = `Create a short-form social video prompt featuring ${sentenceList(subjectBits)} in ${outfitLine}, styled with ${shoeLine}, ${accessoryLine}, and ${styleLine}. Set the video in ${occasion}, with ${backgroundLine}. Shoot it using ${cameraLine}, ${lightingLine}, and ${shadowLine}. Include ${detailLine}.${ornateLine}${referenceLine} Structure the video with: 1) opening hook shot, 2) slow reveal of outfit and subject, 3) detail shots of hair, accessories, shoes, and textures, 4) a pose or movement moment, and 5) a clean ending hero frame. ${uniquenessLine} Keep the result polished, luxury, cinematic, platform-ready, and suitable for TikTok, Reels, or Shorts. ${variationLabel}`;
+
+      return { photoPrompt, videoPrompt };
+    }
+
+    function renderPrompts(seed=0) {
+      const { photoPrompt, videoPrompt } = generatePrompts(seed);
+      ids.photoOutput.textContent = photoPrompt;
+      ids.videoOutput.textContent = videoPrompt;
+      document.getElementById('outputSection').scrollIntoView({ behavior:'smooth', block:'start' });
+      return { photoPrompt, videoPrompt };
+    }
+
+    function showToast(message){ const t=document.getElementById('toast'); if(!t) return; t.textContent=message; t.classList.add('show'); clearTimeout(showToast._timer); showToast._timer=setTimeout(()=>t.classList.remove('show'),1600); }
+
+    function copyText(text, button) {
+      if (!text || text.includes('will show up here')) return;
+      const finish = (ok) => {
+        const original = button.textContent;
+        button.textContent = ok ? 'Copied ✓' : 'Copy Failed';
+        if (ok) button.style.background = 'linear-gradient(135deg, #0ea56d, #10b981)';
+        setTimeout(() => { button.textContent = original; button.style.background = ''; }, 1800);
+        if (ok) showToast('Copied to clipboard');
+      };
+      if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(() => finish(true)).catch(() => fallbackCopy(text, finish));
+      else fallbackCopy(text, finish);
+    }
+
+    function fallbackCopy(text, finish) {
+      const area = document.createElement('textarea');
+      area.value = text;
+      document.body.appendChild(area);
+      area.select();
+      try { document.execCommand('copy'); finish(true); } catch { finish(false); }
+      area.remove();
+    }
+
+    function toggleLock(key, btn) {
+      locks[key] = !locks[key];
+      btn.classList.toggle('locked', locks[key]);
+      btn.textContent = locks[key] ? '🔒 Locked' : '🔓 Unlocked';
+    }
+
+    function randomizeUnlocked() {
+      if (!locks.gender) ids.sections.gender.input.value = ['None','Man','Woman'][Math.floor(Math.random()*3)];
+      updateGenderVisibility();
+      const map = {
+        ethnicity: DATA.ethnicities, skinTone: DATA.skinTones, eyeColor: DATA.eyeColors, hairStyle: DATA.hairStyles,
+        hairColor: DATA.hairColors, hairGems: DATA.hairGems, hairEdges: DATA.hairEdges, lashes: DATA.lashes,
+        style: BASE_STYLES, womenOutfit: DATA.womenOutfits, menOutfit: DATA.menOutfits, womenShoes: DATA.womenShoes,
+        menShoes: DATA.menShoes, womenAccessories: DATA.womenAccessories, menAccessories: DATA.menAccessories,
+        ornate: DATA.ornateElements, camera: DATA.cameraControls, lighting: DATA.lightingControls, shadow: DATA.shadowControls, background: DATA.backgroundControls
+      };
+      Object.keys(map).forEach(key => { if (!locks[key]) setSelectedValues(ids.sections[key].input, randomFrom(map[key], 1, key === 'background' || key === 'skinTone' || key === 'eyeColor' || key === 'lashes' ? 1 : 2)); });
+      if (!locks.occasion) ids.sections.occasion.input.value = randomFrom(['a luxury rooftop party','a downtown street style shoot','a private jet entrance','a five-star hotel lobby','a fashion week arrival','a sunset resort walkway','a beauty studio campaign','a high-end retail corridor'],1,1)[0];
+      if (!locks.details) ids.sections.details.input.value = randomFrom(['confident body language','soft smile with strong posture','camera-aware side glance','walking pose with movement','glossy beauty finish','hero stance with polished styling','fashion-forward expression','intentional hand placement'],1,1)[0];
+      if (!locks.reference) { ids.sections.reference.input.checked = Math.random() > 0.5; if (!ids.sections.reference.input.checked) ids.sections.reference.custom.value = ''; }
+      renderPrompts(0);
+    }
+
+    function clearAll() {
+      sections.forEach(section => {
+        const obj = ids.sections[section.key];
+        if (!obj) return;
+        if (section.type === 'multi' || section.type === 'single') setSelectedValues(obj.input, []);
+        if (section.type === 'text') obj.input.value = '';
+        if (section.type === 'reference') obj.input.checked = false;
+        if (obj.custom) obj.custom.value = '';
+      });
+      ids.sections.gender.input.value = 'None';
+      ids.photoOutput.innerHTML = '<span class="placeholder">Your photo prompt will show up here.</span>';
+      ids.videoOutput.innerHTML = '<span class="placeholder">Your video prompt will show up here.</span>';
+      ids.variationWrap.innerHTML = '<div class="placeholder">Your three extra prompt variations will show up here.</div>';
+      updateGenderVisibility();
+    }
+
+    const PRESET_VALUES = {
+      'Boss Babe Blueprint': { gender:['Woman'], style:['Bossed Up Glam','Polished Executive'], womenOutfit:['Boss Blazer Dress'], womenShoes:['Pointed Toe Pumps'], womenAccessories:['Structured Tote'], background:['Luxury Lobby'], lighting:['Luxury Lobby Warm Light'], camera:['Editorial Cover Framing'] },
+      'City Luxe': { gender:['Woman'], style:['City Luxe'], womenOutfit:['Wide Leg Suit'], womenShoes:['Ankle Strap Heels'], womenAccessories:['Top Handle Bag'], background:['City Rooftop'], lighting:['Editorial Flash'], camera:['Wide Fashion Shot'] },
+      'Coastal Glam': { gender:['Woman'], style:['Coastal Rich','Resort Glam'], womenOutfit:['Linen Resort Set'], womenShoes:['Wedge Sandals'], womenAccessories:['Silk Scarf'], background:['Sunset Beach Walkway'], lighting:['Golden Hour Light'], camera:['Full Body Shot'] },
+      'Cowgirl Rich': { gender:['Woman'], style:['Western Reboot'], womenOutfit:['Tailored Shorts Set'], womenShoes:['Cowboy Boots'], womenAccessories:['Waist Belt'], background:['Ranch Estate'], lighting:['Sunset Glow'], camera:['Three Quarter Portrait'] },
+      'Editorial Denim': { gender:['Woman'], style:['Editorial Denim'], womenOutfit:['Denim Set'], womenShoes:['White Sneakers'], womenAccessories:['Shoulder Bag'], background:['Street Style Corner'], lighting:['Crisp Daylight'], camera:['Walking Follow Shot'] },
+      'Futuristic Glow': { gender:['Man'], style:['Futuristic Glam','Cyber Safari'], menOutfit:['Editorial Streetwear Set'], menShoes:['Chunky Sneakers'], menAccessories:['Crossbody Bag'], background:['Futuristic Hallway'], lighting:['Neon Accent Lighting'], camera:['Heroic Low Angle Shot'] },
+      'Golden Hour Rich': { gender:['Woman'], style:['Quiet Luxury','Resort Glam'], womenOutfit:['Slip Dress'], womenShoes:['Strappy Sandals'], womenAccessories:['Drop Earrings'], background:['Garden Estate'], lighting:['Golden Hour Light'], camera:['Head to Toe Full Body'] },
+      'Leather Drama': { gender:['Man'], style:['Industrial Tech','Runway Rich'], menOutfit:['Leather Suit'], menShoes:['Slim Dress Boots'], menAccessories:['Designer Watch'], background:['Black Gloss Set'], lighting:['High Contrast Dramatic Light'], camera:['Eye Level Shot'] },
+      'Mermaid Pop': { gender:['Woman'], style:['Mermaidcore','Dreamcore'], womenOutfit:['Mermaid Dress'], womenShoes:['Crystal Pumps'], womenAccessories:['Mini Bag'], ornate:['Dreamy Sparkles'], background:['Dreamy Cloud Backdrop'], lighting:['Polished Beauty Light'], camera:['Close Up Portrait'] },
+      'Minimal Money': { gender:['Man'], style:['Minimal Money','Quiet Luxury'], menOutfit:['Open Collar Suit'], menShoes:['Classic Loafers'], menAccessories:['Designer Watch'], background:['Minimal Concrete Studio'], lighting:['Natural Window Light'], camera:['Three Quarter Portrait'] },
+      'Penthouse Power': { gender:['Woman'], style:['Polished Executive','Runway Rich'], womenOutfit:['Editorial Pantsuit'], womenShoes:['Slingback Heels'], womenAccessories:['Designer Tote'], background:['Boutique Penthouse Suite'], lighting:['Window Strip Light'], camera:['Editorial Cover Framing'] },
+      'Pink Pressure': { gender:['Woman'], style:['Pink Pressure','Y2K Gloss'], womenOutfit:['Mini Dress'], womenShoes:['Platform Sandals'], womenAccessories:['Statement Earrings'], background:['Color Wash Backdrop'], lighting:['Beauty Ring Light'], camera:['Waist Up Shot'] },
+      'Quiet Luxury': { gender:['Man'], style:['Quiet Luxury','Old Money Edge'], menOutfit:['Cashmere Knit Set'], menShoes:['Suede Loafers'], menAccessories:['Pocket Square'], background:['Luxury Retail Corridor'], lighting:['Polished Beauty Light'], camera:['Full Body Shot'] },
+      'Street Heat': { gender:['Man'], style:['Street Prep','Luxury Athleisure'], menOutfit:['Street Luxury Set'], menShoes:['High Top Sneakers'], menAccessories:['Beanie'], background:['Graffiti Alley'], lighting:['Editorial Flash'], camera:['Motion Blur Tracking Shot'] },
+      'Velvet Night': { gender:['Woman'], style:['Velvet Night','Runway Rich'], womenOutfit:['Sequin Dress'], womenShoes:['Metallic Heels'], womenAccessories:['Evening Gloves'], background:['Moody Velvet Backdrop'], lighting:['Candlelit Warmth'], camera:['Side Profile Pose'] }
+    };
+
+    function applyPreset(name) {
+      const preset = PRESET_VALUES[name];
+      if (!preset) return;
+      Object.keys(preset).forEach(key => {
+        if (!locks[key]) setSelectedValues(ids.sections[key].input, preset[key]);
+      });
+      updateGenderVisibility();
+      renderPrompts(0);
+    }
+
+    function setTab(tab) {
+      activeTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
+      ids.photoOutput.hidden = tab !== 'photo';
+      ids.videoOutput.hidden = tab !== 'video';
+    }
+
+    function buildPresetButtons() {
+      DATA.presets.forEach((presetName) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn preset-btn';
+        btn.textContent = presetName;
+        btn.addEventListener('click', () => applyPreset(presetName));
+        document.getElementById('presetGrid').appendChild(btn);
+      });
+    }
+    function savePrompt() {
+      if (!ids.photoOutput.textContent || ids.photoOutput.textContent.includes('will show up here')) renderPrompts(0);
+      const item = { id: Date.now(), createdAt: new Date().toLocaleString(), photo: ids.photoOutput.textContent, video: ids.videoOutput.textContent };
+      const existing = JSON.parse(localStorage.getItem('glamPromptHistory') || '[]');
+      existing.unshift(item);
+      localStorage.setItem('glamPromptHistory', JSON.stringify(existing.slice(0, 20)));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const items = JSON.parse(localStorage.getItem('glamPromptHistory') || '[]');
+      if (!items.length) {
+        ids.historyList.innerHTML = '<div class="placeholder" style="padding-top:8px;">Saved prompts will show up here.</div>';
+        return;
+      }
+      ids.historyList.innerHTML = '';
+      items.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'history-item';
+        row.innerHTML = `<div style="font-weight:800;color:#fff;">${item.createdAt}</div><div style="color:#c9d3f6;margin-top:6px;">${item.photo.slice(0,240)}${item.photo.length > 240 ? '…' : ''}</div>`;
+        const btnRow = document.createElement('div');
+        btnRow.className = 'output-actions';
+        btnRow.style.marginTop = '8px';
+        const loadBtn = document.createElement('button');
+        loadBtn.className = 'btn btn-dark small';
+        loadBtn.textContent = 'Load';
+        loadBtn.addEventListener('click', () => { ids.photoOutput.textContent = item.photo; ids.videoOutput.textContent = item.video; setTab('photo'); document.getElementById('outputSection').scrollIntoView({ behavior:'smooth', block:'start' }); });
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'btn btn-dark small';
+        copyBtn.textContent = 'Copy Photo';
+        copyBtn.addEventListener('click', () => copyText(item.photo, copyBtn));
+        btnRow.appendChild(loadBtn);
+        btnRow.appendChild(copyBtn);
+        row.appendChild(btnRow);
+        ids.historyList.appendChild(row);
+      });
+    }
+
+    function init() {
+      const builder = document.getElementById('builderSections');
+      sections.forEach(section => {
+        locks[section.key] = false;
+        builder.appendChild(makeCard(section));
+      });
+      fillSelect(ids.sections.gender.input, DATA.genders, false);
+      fillSelect(ids.sections.ethnicity.input, DATA.ethnicities);
+      fillSelect(ids.sections.skinTone.input, DATA.skinTones);
+      fillSelect(ids.sections.eyeColor.input, DATA.eyeColors);
+      fillSelect(ids.sections.hairStyle.input, DATA.hairStyles);
+      fillSelect(ids.sections.hairColor.input, DATA.hairColors);
+      fillSelect(ids.sections.hairGems.input, DATA.hairGems);
+      fillSelect(ids.sections.hairEdges.input, DATA.hairEdges);
+      fillSelect(ids.sections.lashes.input, DATA.lashes);
+      fillSelect(ids.sections.style.input, BASE_STYLES);
+      fillSelect(ids.sections.womenOutfit.input, DATA.womenOutfits);
+      fillSelect(ids.sections.menOutfit.input, DATA.menOutfits);
+      fillSelect(ids.sections.womenShoes.input, DATA.womenShoes);
+      fillSelect(ids.sections.menShoes.input, DATA.menShoes);
+      fillSelect(ids.sections.womenAccessories.input, DATA.womenAccessories);
+      fillSelect(ids.sections.menAccessories.input, DATA.menAccessories);
+      fillSelect(ids.sections.ornate.input, DATA.ornateElements);
+      fillSelect(ids.sections.camera.input, DATA.cameraControls);
+      fillSelect(ids.sections.lighting.input, DATA.lightingControls);
+      fillSelect(ids.sections.shadow.input, DATA.shadowControls);
+      fillSelect(ids.sections.background.input, DATA.backgroundControls);
+
+      buildPresetButtons();
+      renderHistory();
+      updateGenderVisibility();
+
+      document.getElementById('generateBtn').addEventListener('click', () => { renderPrompts(0); showToast('Prompts generated'); });
+      document.getElementById('generateTopBtn').addEventListener('click', () => { renderPrompts(0); showToast('Prompts generated'); });
+      document.getElementById('randomizeBtn').addEventListener('click', () => { randomizeUnlocked(); showToast('Unlocked sections randomized'); });
+      document.getElementById('clearBtn').addEventListener('click', () => { clearAll(); showToast('Builder cleared'); });
+      document.getElementById('savePromptBtn').addEventListener('click', () => { savePrompt(); showToast('Prompt saved'); });
+      document.getElementById('unlockAllBtn').addEventListener('click', () => {
+        document.querySelectorAll('.lock-btn').forEach(btn => {
+          const key = btn.dataset.lock;
+          locks[key] = false;
+          btn.classList.remove('locked');
+          btn.textContent = '🔓 Unlocked';
+        });
+        showToast('All sections unlocked');
+      });
+      document.getElementById('jumpToOutputBtn').addEventListener('click', () => {
+        document.getElementById('outputSection').scrollIntoView({ behavior:'smooth', block:'start' });
+        showToast('Jumped to output');
+      });
+      document.addEventListener('click', (e) => {
+        if (e.target.matches('.lock-btn')) toggleLock(e.target.dataset.lock, e.target);
+      });
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => setTab(btn.dataset.tab)));
+      ids.sections.gender.input.addEventListener('change', updateGenderVisibility);
+
+      document.getElementById('copyActiveBtn').addEventListener('click', (e) => {
+        const text = activeTab === 'photo' ? ids.photoOutput.textContent : ids.videoOutput.textContent;
+        copyText(text, e.currentTarget);
+      });
+      document.getElementById('copyPhotoBtn').addEventListener('click', (e) => copyText(ids.photoOutput.textContent, e.currentTarget));
+      document.getElementById('copyVideoBtn').addEventListener('click', (e) => copyText(ids.videoOutput.textContent, e.currentTarget));
+    }
+
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init, { once:true }); } else { init(); }
+
+    const defaultConfig = {
+      app_title: 'Custom Outfit Builder',
+      app_subtitle: 'Build fashion prompts fast with presets, locks, multi-select sections, reference-photo support, photo prompts, video prompts, save prompt, prompt history, and three extra variations in one glam file.'
+    };
+
+    function onConfigChange(config) {
+      document.getElementById('app-title').textContent = config.app_title || defaultConfig.app_title;
+      document.getElementById('app-subtitle').textContent = config.app_subtitle || defaultConfig.app_subtitle;
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            { get: () => config.primary_color || '#1f3fff', set: (value) => { document.documentElement.style.setProperty('--royal', value); config.primary_color = value; window.elementSdk.setConfig({ primary_color: value }); } },
+            { get: () => config.secondary_color || '#f5b301', set: (value) => { document.documentElement.style.setProperty('--gold', value); config.secondary_color = value; window.elementSdk.setConfig({ secondary_color: value }); } }
+          ]
+        })
+      });
+    }
+  </script>
+</body>
+</html>
